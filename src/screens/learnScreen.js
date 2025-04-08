@@ -4,11 +4,11 @@ import { ip_address } from "../../config";
 import { TouchableOpacity, View, Text, Image, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Curs from "../components/curs"; // Импортируем компонент Curs
+import Kviz from "../components/kviz"; // Импортируем компонент Kviz
 
 export default function LearnScreen() {
     // Навигация
     const navigation = useNavigation();
-
     // Данные из базы данных
     const [posts, setPosts] = useState([]);
     const [actualPosts, setActualPosts] = useState([]);
@@ -21,6 +21,7 @@ export default function LearnScreen() {
         { id: 4, name: "Кузнецов Кузя", points: 70 },
         { id: 5, name: "Смирнов Семён", points: 60 },
     ]); // Массив пользователей
+    const [kvizPosts, setKvizPosts] = useState([]); // Данные квизов
 
     /////////////////////// Получение из БД /////////////////////////
     // Получение активных курсов
@@ -46,10 +47,22 @@ export default function LearnScreen() {
         }
     };
 
+    // Получение данных квизов
+    const getKvizPosts = async () => {
+        try {
+            const response = await fetch(ip_address + '/api/getKvizPosts'); // Замените на ваш API-путь
+            const data = await response.json();
+            setKvizPosts(data);
+        } catch (error) {
+            console.error('Error fetching kviz posts:', error);
+        }
+    };
+
     // Вызываем функции получения информации из БД
     useFocusEffect(useCallback(() => {
         getAllPosts();
         getAllFilters();
+        getKvizPosts(); // Добавляем вызов функции для получения квизов
     }, []));
 
     /////////////////////// Функции /////////////////////////
@@ -64,7 +77,6 @@ export default function LearnScreen() {
                 ));
             }
         };
-
         updateActualPosts();
     }, [selectedFilters]);
 
@@ -118,7 +130,6 @@ export default function LearnScreen() {
                     {item.name}
                 </Text>
             </View>
-
             {/* Правая часть (очки и иконка) */}
             <View style={styles.userInfoRight}>
                 <Text
@@ -143,6 +154,11 @@ export default function LearnScreen() {
         <Curs postData={item} />
     );
 
+    // Отображаем квиз с использованием компонента Kviz
+    const renderKviz = ({ item }) => (
+        <Kviz postData={item} />
+    );
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {/* Верхняя панель (логотипы и фильтры) */}
@@ -151,7 +167,6 @@ export default function LearnScreen() {
                 <View style={styles.header}>
                     {/* Левая часть заголовка */}
                     <Text style={styles.headerText}>Обучение</Text>
-
                     {/* Правая часть заголовка (текст "100" и изображение) */}
                     <View style={styles.pointsContainer}>
                         <Text style={styles.pointsText}>100</Text>
@@ -161,7 +176,6 @@ export default function LearnScreen() {
                         />
                     </View>
                 </View>
-
                 {/* Рейтинг пользователей */}
                 <View style={styles.userListContainer}>
                     <Text style={styles.userListTitle}>Рейтинг пользователей</Text>
@@ -172,9 +186,23 @@ export default function LearnScreen() {
                         contentContainerStyle={styles.userListContent}
                     />
                 </View>
-
                 {/* Кнопки фильтров (горизонтальная прокрутка) */}
+                
+            </View>
+            <View style={styles.kvizSection}>
+                <Text style={styles.kvizTitle}>Квизы</Text>
                 <FlatList
+                    data={kvizPosts}
+                    keyExtractor={(item) => item.course_id.toString()}
+                    renderItem={renderKviz}
+                    horizontal // Горизонтальная прокрутка
+                    showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
+                    contentContainerStyle={styles.kvizListContent}
+                />
+            </View>
+            {/* Лента курсов*/}
+            <View>
+            <FlatList
                     data={filters}
                     keyExtractor={(item) => item.id.toString()} // Уникальный ключ для каждого фильтра
                     renderItem={renderFilter}
@@ -182,9 +210,6 @@ export default function LearnScreen() {
                     showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
                     contentContainerStyle={styles.filtersContainer}
                 />
-            </View>
-
-            {/* Лента курсов (горизонтальная) */}
             <FlatList
                 data={actualPosts}
                 keyExtractor={(item) => item.course_id.toString()}
@@ -195,7 +220,9 @@ export default function LearnScreen() {
                     paddingBottom: 60, // Отступ снизу для нижней панели
                 }}
                 showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
-            />
+            />           
+            </View>
+           
         </SafeAreaView>
     );
 }
@@ -308,5 +335,18 @@ const styles = StyleSheet.create({
     },
     fullOrangeText: {
         color: '#FF4F12', // Полностью оранжевый текст
+    },
+    kvizSection: {
+        marginTop: 20,
+        paddingHorizontal: 10,
+    },
+    kvizTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
+    },
+    kvizListContent: {
+        paddingVertical: 10,
     },
 });
