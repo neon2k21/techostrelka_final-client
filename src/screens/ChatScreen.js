@@ -1,23 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, Button, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
 import axios from 'axios';
+import { Octicons } from '@expo/vector-icons'; // Импортируем иконки
 
 export default function ChatScreen({ navigation }) {
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState([
     { sender: 'ai', text: 'Привет! Хочешь разобраться, что тебе больше всего интересно? Помогу!' },
     { sender: 'user', text: 'Привет! Да, хочу разобраться.' },
-    { sender: 'ai', text: 'Давай попробуем выяснить. Представь, что ты идешь по огромному музею. Какой зал ты хотел бы посетить первым: с картинами великих художников, с экспозицией древних артефактов, с моделями научных изобретений или с рассказами о культурных обычаях разных народов?' },
-    { sender: 'user', text: 'Наверное, сначала я бы заглянул в зал с древними артефактами.' },
-    { sender: 'ai', text: 'Отлично! Это может говорить о твоем интересе к истории. А если бы тебе предложили провести вечер за чтением книги, какую бы ты выбрал: биографию ученого, сборник народных сказаний, альбом с репродукциями известных картин или исследование о том, как появились определенные традиции?' },
-    { sender: 'user', text: 'Наверное, сборник народных сказаний.' },
-    { sender: 'ai', text: 'Значит, тебя также привлекает тема традиций! Теперь представь, что тебе нужно сделать проект. Темы такие: проанализировать влияние искусства на общество, рассказать о важнейших научных открытиях, разобрать эволюцию праздников или исследовать причины исторических событий. Что бы ты выбрал?' },
-    { sender: 'user', text: 'Возможно, проанализировать влияние искусства.' },
-    { sender: 'ai', text: 'Вот мы и нашли еще одну категорию — искусство! А что насчет научных изобретений? Тебя увлекают технологии будущего или это не твое?' },
-    { sender: 'user', text: 'Ну, технологии будущего звучат интересно, но все-таки мне ближе что-то другое.' },
-    { sender: 'ai', text: 'Понял! В таком случае, основные категории твоих интересов — это история, традиции и искусство. Научные изобретения пока не в приоритете, и это нормально. Каждый человек уникален! :)' },
-    { sender: 'user', text: 'Спасибо! Теперь стало намного понятнее.' },
-    { sender: 'ai', text: 'Рад был помочь! Если захочешь углубиться в любую из этих тем, обращайся. Удачи в новых открытиях! :)' },
+    { sender: 'ai', text: 'Давай попробуем выяснить...' },
   ]);
   const [context, setContext] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -76,15 +67,27 @@ export default function ChatScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Заголовок */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.clearButton}
-          onPress={handleClear}
-        >
-          <Text style={styles.clearButtonText}>X</Text>
+        <View style={styles.profileContainer}>
+          {/* Аватар */}
+          <Image
+            source={require('../../assets/mascot.png')} // Убедитесь, что у вас есть изображение в assets
+            style={styles.avatar}
+          />
+          {/* Имя и подпись */}
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>KULTKOD</Text>
+            <Text style={styles.profileSubtitle}>чат с ИИ</Text>
+          </View>
+        </View>
+        {/* Кнопка очистки контекста */}
+        <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+          <Text style={styles.clearButtonText}>Очистить контекст</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Лента чата */}
       <ScrollView
         ref={scrollViewRef}
         style={styles.chatContainer}
@@ -102,6 +105,7 @@ export default function ChatScreen({ navigation }) {
         ))}
       </ScrollView>
 
+      {/* Поле ввода и иконка отправки */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -110,9 +114,20 @@ export default function ChatScreen({ navigation }) {
           onChangeText={setInputText}
           editable={!isLoading}
         />
-        <Button title="Отправить" onPress={handleSend} disabled={isLoading} />
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleSend}
+          disabled={isLoading}
+        >
+          <Octicons
+            name="paper-airplane"
+            size={24}
+            color="#FF4F12"
+          />
+        </TouchableOpacity>
       </View>
 
+      {/* Индикатор загрузки */}
       {isLoading && (
         <Text style={styles.loadingText}>Загрузка...</Text>
       )}
@@ -127,23 +142,41 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: 10,
-    marginTop: 10,
-    paddingHorizontal: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    backgroundColor: '#7700FF', // Фиолетовый цвет фона заголовка
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Круглая форма аватара
+  },
+  profileInfo: {
+    marginLeft: 10,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  profileSubtitle: {
+    fontSize: 14,
+    color: '#f0f0f0',
   },
   clearButton: {
-    width: 30,
-    height: 30,
-    backgroundColor: '#ff4d4d',
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 5,
   },
   clearButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   chatContainer: {
     flex: 1,
@@ -157,11 +190,17 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    backgroundColor: '#f0f0f0', // Светлый фон для поля ввода
     borderRadius: 5,
     paddingHorizontal: 10,
     marginRight: 10,
+    height: 40,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   messageContainer: {
     padding: 10,

@@ -81,7 +81,7 @@ function Bottom_stacknavigator() {
                     // Возвращаем иконку с текущим цветом и размером
                     return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: 'orange', // Цвет иконки при выборе
+                tabBarActiveTintColor: '#FF4F12', // Цвет иконки при выборе
                 tabBarInactiveTintColor: '#ccc', // Цвет иконки, когда экран не выбран
                 tabBarLabelStyle: {
                     fontSize: 12,

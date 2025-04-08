@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     selectedFilterButtonText: {
-        color: 'orange', // Цвет текста для выбранного фильтра
+        color: '#FF4F12', // Цвет текста для выбранного фильтра
         fontWeight: 'bold',
     },
 });
