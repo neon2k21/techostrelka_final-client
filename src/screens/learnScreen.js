@@ -14,13 +14,7 @@ export default function LearnScreen() {
     const [actualPosts, setActualPosts] = useState([]);
     const [filters, setFilters] = useState([]);
     const [selectedFilters, setSelectedFilters] = useState([]);
-    const [users, setUsers] = useState([
-        { id: 1, name: "Иванов Иван", points: 100 },
-        { id: 2, name: "Петров Петр", points: 90 },
-        { id: 3, name: "Сидоров Сидор", points: 80 },
-        { id: 4, name: "Кузнецов Кузя", points: 70 },
-        { id: 5, name: "Смирнов Семён", points: 60 },
-    ]); // Массив пользователей
+    const [users, setUsers] = useState([]); // Массив пользователей
     const [kvizPosts, setKvizPosts] = useState([]); // Данные квизов
 
     /////////////////////// Получение из БД /////////////////////////
@@ -47,10 +41,22 @@ export default function LearnScreen() {
         }
     };
 
+    const getAllUsers = async () => {
+        try {
+            const response = await fetch(ip_address + '/api/getalluserforlist');
+            console.log(response)
+            const data = await response.json();
+            console.log(data)
+            setUsers(data);
+        } catch (error) {
+            console.error('Error fetching filters:', error);
+        }
+    };
+
     // Получение данных квизов
     const getKvizPosts = async () => {
         try {
-            const response = await fetch(ip_address + '/api/getKvizPosts'); // Замените на ваш API-путь
+            const response = await fetch(ip_address + '/api/getAllKviz'); // Замените на ваш API-путь
             const data = await response.json();
             setKvizPosts(data);
         } catch (error) {
@@ -61,6 +67,7 @@ export default function LearnScreen() {
     // Вызываем функции получения информации из БД
     useFocusEffect(useCallback(() => {
         getAllPosts();
+        getAllUsers();
         getAllFilters();
         getKvizPosts(); // Добавляем вызов функции для получения квизов
     }, []));
@@ -181,7 +188,6 @@ export default function LearnScreen() {
                     <Text style={styles.userListTitle}>Рейтинг пользователей</Text>
                     <FlatList
                         data={users}
-                        keyExtractor={(item) => item.id.toString()} // Уникальный ключ для каждого пользователя
                         renderItem={renderUser}
                         contentContainerStyle={styles.userListContent}
                     />
@@ -193,7 +199,7 @@ export default function LearnScreen() {
                 <Text style={styles.kvizTitle}>Квизы</Text>
                 <FlatList
                     data={kvizPosts}
-                    keyExtractor={(item) => item.course_id.toString()}
+                    keyExtractor={(item) => item.id.toString()}
                     renderItem={renderKviz}
                     horizontal // Горизонтальная прокрутка
                     showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки

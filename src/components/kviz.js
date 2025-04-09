@@ -1,8 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, Image, StyleSheet, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Импортируем useNavigation
+import { ip_address } from "../../config";
+
+// Импортируем изображение валюты
+import currencyIcon from '../../assets/point.png';
 
 export default function Kviz({ postData }) {
     const [isModalVisible, setIsModalVisible] = useState(false); // Состояние для модального окна
+    const [kviz, setkviz] = useState([]);
+    const navigation = useNavigation(); // Получаем доступ к навигации
+
+    const getCurrentKviz = async (id) => {
+        try {
+            const response = await fetch(ip_address + '/api/getsplashkviz', {
+                method: 'POST', // Используем метод POST
+                headers: {
+                    'Content-Type': 'application/json', // Указываем, что данные отправляются в формате JSON
+                },
+                body: JSON.stringify({ id }), // Передаем id в теле запроса
+            });
+            const data = await response.json();
+            console.log(data);
+            setkviz(data); // Сохраняем полученные данные в состояние
+        } catch (error) {
+            console.error('Error fetching kviz:', error);
+        }
+    };
+
+    useEffect(() => {
+        getCurrentKviz(postData.id);
+    }, []);
 
     // Функция для открытия модального окна
     const openModal = () => {
@@ -14,6 +42,12 @@ export default function Kviz({ postData }) {
         setIsModalVisible(false);
     };
 
+    // Функция для перехода на экран QuezScreen
+    const handleGoToQuiz = () => {
+        closeModal(); // Закрываем модальное окно
+        navigation.navigate("Квиз", { kvizData: postData }); // Переходим на экран QuezScreen
+    };
+
     return (
         <View style={styles.card}>
             {/* Контейнер для текстового контента и стрелки */}
@@ -21,12 +55,19 @@ export default function Kviz({ postData }) {
                 {/* Левая часть (название квиза и количество очков) */}
                 <View style={styles.leftContent}>
                     {/* Название квиза */}
-                    <Text style={styles.quizName}>{postData.course_name}</Text>
+                    <Text style={styles.quizName}>{postData.name}</Text>
 
                     {/* Количество очков */}
-                    <Text style={styles.pointsText}>
-                        {postData.points} очков
-                    </Text>
+                    <View style={styles.rewardContainer}>
+                        <Text style={styles.pointsText}>
+                            {postData.reward}
+                        </Text>
+                        {/* Изображение валюты */}
+                        <Image
+                            source={currencyIcon}
+                            style={styles.currencyIcon}
+                        />
+                    </View>
                 </View>
 
                 {/* Правая часть (стрелка вправо) */}
@@ -49,29 +90,27 @@ export default function Kviz({ postData }) {
                             <Text style={styles.closeButtonText}>×</Text>
                         </TouchableOpacity>
 
-                        {/* Изображение курса */}
-                        <Image
-                            source={{ uri: `${postData.course_preview}` }}
-                            style={styles.modalImage}
-                        />
-
                         {/* Название курса */}
-                        <Text style={styles.modalCourseName}>{postData.course_name}</Text>
+                        <Text style={styles.modalCourseName}>{postData.name}</Text>
 
                         {/* Топик курса */}
-                        <Text style={styles.modalTopicName}>{postData.topic_name}</Text>
+                        <View style={styles.modalRewardContainer}>
+                            <Text style={styles.modalTopicName}>+ {postData.reward}</Text>
+                            {/* Изображение валюты */}
+                            <Image
+                                source={currencyIcon}
+                                style={styles.modalCurrencyIcon}
+                            />
+                        </View>
 
                         {/* Количество разделов */}
                         <Text style={styles.modalSections}>
-                            Разделов: {postData.sections_count}{' '}
-                            {postData.sections_count % 2 === 0 ? '(четное)' : '(нечетное)'}
+                            {kviz.questions_count}{' '}
+                            {kviz.questions_count % 2 === 0 ? 'Вопроса' : 'Вопросов'}
                         </Text>
 
-                        {/* Описание курса */}
-                        <Text style={styles.modalDescription}>{postData.description}</Text>
-
                         {/* Кнопка "Поехали!" */}
-                        <TouchableOpacity style={styles.goButton}>
+                        <TouchableOpacity style={styles.goButton} onPress={handleGoToQuiz}>
                             <Text style={styles.goButtonText}>Поехали!</Text>
                         </TouchableOpacity>
                     </View>
@@ -178,5 +217,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#fff',
         fontWeight: 'bold',
+    },
+    rewardContainer: {
+        flexDirection: 'row', // Размещаем текст и изображение в строку
+        alignItems: 'center', // Выравниваем элементы по центру
+    },
+    currencyIcon: {
+        width: 16, // Ширина изображения
+        height: 16, // Высота изображения
+        marginLeft: 5, // Отступ между текстом и изображением
+        resizeMode: 'contain', // Сохраняем пропорции изображения
+    },
+    modalRewardContainer: {
+        flexDirection: 'row', // Размещаем текст и изображение в строку
+        alignItems: 'center', // Выравниваем элементы по центру
+    },
+    modalCurrencyIcon: {
+        width: 20, // Ширина изображения
+        height: 20, // Высота изображения
+        marginLeft: 5, // Отступ между текстом и изображением
+        resizeMode: 'contain', // Сохраняем пропорции изображения
     },
 });
