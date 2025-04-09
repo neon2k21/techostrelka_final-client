@@ -1,1 +1,1 @@
-export const ip_address =  "http://127.0.0.1:8080"
+export const ip_address =  "http://172.20.10.5:8080"

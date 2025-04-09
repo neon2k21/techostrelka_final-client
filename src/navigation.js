@@ -109,7 +109,7 @@ function Bottom_stacknavigator() {
 export default function AppNavigation() {
     return (
         <NavigationContainer>
-            <Bottom_stacknavigator />
+            <Login_StackNavigator />
         </NavigationContainer>
     );
 }

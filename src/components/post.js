@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'; // Импортир
 import { ip_address } from "../../config";
 
 export default function Post({ postData }) {
-    const [like, setLike] = useState(0);
+    const [like, setLike] = useState(999);
     const [isLiked, setIsLiked] = useState(false); // Состояние для отслеживания лайка
     const [isExpanded, setIsExpanded] = useState(false); // Состояние для раскрытия текста
 
@@ -16,7 +16,7 @@ export default function Post({ postData }) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    post_id: postData.id,
+                    posts_id: postData.post_id,
                     user_id: global.id
                 })
             });
@@ -39,16 +39,39 @@ export default function Post({ postData }) {
         }
     };
 
+     // Функция для проверки лайка
+     const checkLike = async () => {
+        try {
+            const response = await fetch(`${ip_address}/api/checkLike`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    posts_id: postData.post_id,
+                    user_id: global.id
+                })
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            console.log('Проверка лайка:', data);
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
+    };
+
     // Функция для получения количества лайков
     const getPostLikes = async () => {
         try {
             const response = await fetch(`${ip_address}/api/getPostLikes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ post_id: postData.id })
+                body: JSON.stringify({ posts_id: postData.post_id })
             });
 
             const result = await response.json();
+            console.log(result)
             setLike(result.length);
         } catch (error) {
             console.error('getLikes error', error);
@@ -58,6 +81,7 @@ export default function Post({ postData }) {
     // Получение лайков при фокусе на экране
     useFocusEffect(useCallback(() => {
         getPostLikes();
+        // checkLike();
     }, []));
 
     // Ограничение длины текста

@@ -16,10 +16,10 @@ export default function LoginScreen(){
         myHeaders.append("Content-Type", "application/json");
         
         var raw = JSON.stringify({
-        //   "login": login.toLowerCase(),
-        //   "password": password.toLowerCase()
-          "login": "m",
-          "password": "m"
+          "login": login.toLowerCase(),
+          "password": password.toLowerCase()
+          // "login": "m",
+          // "password": "m"
         });
         
         var requestOptions = {
@@ -29,20 +29,17 @@ export default function LoginScreen(){
           redirect: 'follow'
         };
         
-        fetch(ip_address+'/api/getUserByLogin', requestOptions)
+        fetch(ip_address+'/api/getUser', requestOptions)
           .then(response => response.json())
           .then(async result => {
-            global.id = result.id
-            global.school_id = result.school_id
-            global.grade = result.grade
-            global.letter = result.letter
-            global.type = result.type_of_user
-            global.level = result.level
-            global.coins = result.coins
+            global.id = result[0].id
+            global.name = result[0].name
+            global.percent_by_topic = result[0].grade
+            global.topic1_id = result[0].topic1_id
+            global.topic2_id = result[0].topic2_id
+            global.topic3_id = result[0].topic3_id
+            global.topic4_id = result[0].topic4_id
             global.points = result.points
-            global.area = result.area
-            global.name = result.name
-            global.surname = result.surname
             if(result!="Данные не совпадают! Проверьте и повторите попытку") {
                 navigate('Главный экран')
             }
