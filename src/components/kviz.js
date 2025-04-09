@@ -5,6 +5,7 @@ import { ip_address } from "../../config";
 
 // Импортируем изображение валюты
 import currencyIcon from '../../assets/point.png';
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
 export default function Kviz({ postData }) {
     const [isModalVisible, setIsModalVisible] = useState(false); // Состояние для модального окна
@@ -60,7 +61,7 @@ export default function Kviz({ postData }) {
                     {/* Количество очков */}
                     <View style={styles.rewardContainer}>
                         <Text style={styles.pointsText}>
-                            {postData.reward}
+                            +{postData.reward}
                         </Text>
                         {/* Изображение валюты */}
                         <Image
@@ -72,7 +73,7 @@ export default function Kviz({ postData }) {
 
                 {/* Правая часть (стрелка вправо) */}
                 <View style={styles.rightArrow}>
-                    <Text style={styles.arrowText}>→</Text>
+                    <Image style={styles.nextImage} source={require('../../assets/nextButton.png')}/>
                 </View>
             </TouchableOpacity>
 
@@ -123,32 +124,31 @@ export default function Kviz({ postData }) {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 15,
-        marginVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
+        borderRadius: 5,
+        padding: 10,
+        borderWidth:1,
+        borderColor:'#F3F3F4',
+        width:widthPercentageToDP(93),
+        marginRight:widthPercentageToDP(2),
+        paddingLeft:15
     },
     contentContainer: {
         flexDirection: 'row', // Размещаем текстовый контент и стрелку в строку
         alignItems: 'center', // Выравниваем элементы по центру по вертикали
-        justifyContent: 'space-between', // Распределяем элементы по ширине
     },
     leftContent: {
         flex: 1, // Занимает оставшееся пространство
     },
     quizName: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
+        color: '#000',
+        marginBottom: 1,
+        fontFamily:'Medium'
     },
     pointsText: {
-        fontSize: 14,
-        color: '#7700FF',
+        fontSize: 12,
+        color: '#90969F',
+        fontFamily:'Medium'
     },
     rightArrow: {
         justifyContent: 'center', // Выравниваем стрелку по центру
@@ -223,10 +223,11 @@ const styles = StyleSheet.create({
         alignItems: 'center', // Выравниваем элементы по центру
     },
     currencyIcon: {
-        width: 16, // Ширина изображения
-        height: 16, // Высота изображения
-        marginLeft: 5, // Отступ между текстом и изображением
-        resizeMode: 'contain', // Сохраняем пропорции изображения
+        width: 10, // Ширина изображения
+        height: 10, // Высота изображения
+        marginLeft: 2, // Отступ между текстом и изображением
+        resizeMode: 'contain', // Сохраняем пропорции изображения,
+        marginTop:heightPercentageToDP(-0.07)
     },
     modalRewardContainer: {
         flexDirection: 'row', // Размещаем текст и изображение в строку
@@ -237,5 +238,11 @@ const styles = StyleSheet.create({
         height: 20, // Высота изображения
         marginLeft: 5, // Отступ между текстом и изображением
         resizeMode: 'contain', // Сохраняем пропорции изображения
+    },
+    nextImage: {
+        width: 30, // Ширина изображения
+        height: 30, // Высота изображения
+        resizeMode: 'contain', // Сохраняем пропорции изображения,
+        marginLeft:widthPercentageToDP(1)
     },
 });

@@ -89,13 +89,14 @@ export default function Post({ postData }) {
     const MAX_TEXT_LENGTH = 100; // Максимальная длина текста до обрезки
     const truncatedText = postData.post_description.slice(0, MAX_TEXT_LENGTH) + "...";
     const fullText = postData.post_description;
+    console.log(postData)
 
     return (
         <View style={styles.card}>
             {/* Отображение изображения */}
-            {postData.image && (
+            {postData.post_image && (
                 <Image
-                    source={{ uri: `${ip_address}/images/${postData.image}` }}
+                    source={{ uri: `${ip_address}/${postData.post_image}` }}
                     style={styles.image}
                 />
                 )}

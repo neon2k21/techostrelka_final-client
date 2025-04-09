@@ -95,7 +95,7 @@ export default function MainScreen() {
     );
 
     return (
-        <View style={{ flex: 1, marginTop:heightPercentageToDP(5) }}>
+        <View style={{ flex: 1, backgroundColor:'#fff' }}>
             {/* Верхняя панель (логотипы и фильтры) */}
             <View style={styles.topContainer}>
                 {/* Логотипы */}
@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     topContainer: {
         backgroundColor: '#fff', // Фон верхней панели
         padding: 10,
+        marginTop:heightPercentageToDP(5),
     },
     header: {
         flexDirection: 'row',

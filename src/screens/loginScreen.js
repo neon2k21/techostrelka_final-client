@@ -36,7 +36,7 @@ export default function LoginScreen() {
                     global.topic2_id = result[0].topic2_id;
                     global.topic3_id = result[0].topic3_id;
                     global.topic4_id = result[0].topic4_id;
-                    global.points = result.points;
+                    global.points = result[0].points;
                     navigation.navigate('Главный экран');
                 } else {
                     Alert.alert('Авторизация', result, [

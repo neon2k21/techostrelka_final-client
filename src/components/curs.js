@@ -38,12 +38,11 @@ export default function Curs({ postData }) {
     const closeModal = () => {
         setIsModalVisible(false);
     };
-
     return (
         <View style={styles.card}>
             {/* Изображение курса */}
             <Image
-                source={{ uri: `${postData.course_preview}` }} // Предполагается, что course_preview — это путь к изображению
+                source={{ uri: `${ip_address}/${postData.course_preview}` }} // Предполагается, что course_preview — это путь к изображению
                 style={styles.image}
             />
 

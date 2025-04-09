@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Curs from "../components/curs"; // Импортируем компонент Curs
 import Kviz from "../components/kviz"; // Импортируем компонент Kviz
 import { ScrollView } from "react-native-gesture-handler";
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
 export default function LearnScreen() {
     // Навигация
@@ -116,23 +117,26 @@ export default function LearnScreen() {
 
     // Отображаем пользователя
     const renderUser = ({ item, index }) => (
-        <View style={styles.userContainer}>
+        <View style={[
+            styles.userContainer,
+            index === users.length - 1 && styles.topBorder]}>
             {/* Левая часть (порядковый номер и имя) */}
             <View style={styles.userInfoLeft}>
                 <Text
                     style={[
                         styles.userRank,
-                        (index === 0 || index === 1) && styles.orangeText, // Оранжевый текст для первых двух номеров
-                        index === users.length - 1 && styles.fullOrangeText, // Оранжевый текст для последнего пользователя
+                        (index === 0) && styles.orangeText, // Оранжевый текст для первых двух номеров
+                        (index === 1) && styles.darkOrangeText, // Оранжевый текст для первых двух номеров
+                        (index === 2) && styles.violetText, // Оранжевый текст для первых двух номеров
+                        index === users.length - 1 && styles.orangeText, // Оранжевый текст для последнего пользователя
                     ]}
                 >
-                    {index + 1}.
+                    {index + 1}
                 </Text>
                 <Text
                     style={[
                         styles.userName,
-                        (index === 0 || index === 1) && styles.orangeText, // Оранжевый текст для первых двух номеров
-                        index === users.length - 1 && styles.fullOrangeText, // Оранжевый текст для последнего пользователя
+                        index === users.length - 1 && styles.orangeText, // Оранжевый текст для последнего пользователя
                     ]}
                 >
                     {item.name}
@@ -143,11 +147,10 @@ export default function LearnScreen() {
                 <Text
                     style={[
                         styles.userPoints,
-                        (index === 0 || index === 1) && styles.orangeText, // Оранжевый текст для первых двух номеров
-                        index === users.length - 1 && styles.fullOrangeText, // Оранжевый текст для последнего пользователя
+                        index === users.length - 1 && styles.orangeText, // Оранжевый текст для последнего пользователя
                     ]}
                 >
-                    {item.points} очков
+                    {item.points}
                 </Text>
                 <Image
                     source={require('../../assets/point.png')} // Путь к изображению point
@@ -166,9 +169,9 @@ export default function LearnScreen() {
     const renderKviz = ({ item }) => (
         <Kviz postData={item} />
     );
-
+console.log(kvizPosts.length)
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor:'#F8F8F8'}}>
             <ScrollView>
             {/* Верхняя панель (логотипы и фильтры) */}
             <View style={styles.topContainer}>
@@ -178,36 +181,37 @@ export default function LearnScreen() {
                     <Text style={styles.headerText}>Обучение</Text>
                     {/* Правая часть заголовка (текст "100" и изображение) */}
                     <View style={styles.pointsContainer}>
-                        <Text style={styles.pointsText}>100</Text>
-                        <Image
+                        <Text style={styles.headerText}>{global.points}</Text>                        <Image
                             source={require('../../assets/point.png')} // Путь к изображению point
                             style={styles.pointImage}
                         />
                     </View>
                 </View>
                 {/* Рейтинг пользователей */}
-                <View style={styles.userListContainer}>
-                    <Text style={styles.userListTitle}>Рейтинг пользователей</Text>
                     <FlatList
                         data={users}
                         renderItem={renderUser}
-                        contentContainerStyle={styles.userListContent}
+                        contentContainerStyle={styles.userListContainer}
                     />
-                </View>
                 {/* Кнопки фильтров (горизонтальная прокрутка) */}
                 
             </View>
-            <View style={styles.kvizSection}>
-                <Text style={styles.kvizTitle}>Квизы</Text>
-                <FlatList
+            <Text style={styles.period}>До конца сезона: 1 месяц</Text>
+            <View style={styles.learnContainer}>
+            {kvizPosts.length > 0 && (
+             <View style={styles.kvizSection}>
+                    <Text style={styles.h2}>квизы</Text>
+                    <FlatList
                     data={kvizPosts}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderKviz}
                     horizontal // Горизонтальная прокрутка
                     showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
                     contentContainerStyle={styles.kvizListContent}
-                />
-            </View>
+                    />
+                </View>
+                )}
+            <Text style={[styles.h2, {marginTop:15}]}>курсы</Text>
             {/* Лента курсов*/}
             <View>
             <FlatList
@@ -229,21 +233,18 @@ export default function LearnScreen() {
                 }}
                 showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
             />           
+
+            </View>
             </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     topContainer: {
-        backgroundColor: '#fff', // Фон верхней панели
-        elevation: 3, // Тень для Android
-        shadowColor: '#000', // Тень для iOS
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
         padding: 10,
+        marginTop:heightPercentageToDP(6),
     },
     header: {
         flexDirection: 'row', // Размещаем элементы в строку
@@ -252,9 +253,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 20,
+        color: '#000',
+        fontFamily:'Bold'
     },
     pointsContainer: {
         flexDirection: 'row', // Размещаем текст и изображение в строку
@@ -269,7 +270,8 @@ const styles = StyleSheet.create({
     pointImage: {
         width: 20, // Ширина изображения
         height: 20, // Высота изображения
-        resizeMode: 'contain', // Сохраняем пропорции изображения
+        resizeMode: 'contain', // Сохраняем пропорции изображения,
+        marginLeft:widthPercentageToDP(1)
     },
     logo: {
         width: 100, // Ширина логотипа
@@ -277,30 +279,39 @@ const styles = StyleSheet.create({
         resizeMode: 'contain', // Сохраняем пропорции изображения
     },
     filtersContainer: {
-        paddingVertical: 10,
-        paddingHorizontal: 5,
+        flexDirection: 'row',
+        width: widthPercentageToDP(90), // Ширина контейнера фильтров
+        marginBottom: heightPercentageToDP(-2),
+        marginTop:heightPercentageToDP(1),
+        marginLeft:15
     },
     filterButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
+        paddingVertical: heightPercentageToDP(0.5),
+        paddingHorizontal: widthPercentageToDP(1.5),
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: '#ccc', // Рамка не меняет цвет
-        marginRight: 10, // Отступ между кнопками
+        borderColor: '#F3F3F4',
+        marginBottom: heightPercentageToDP(2),
+        marginRight:widthPercentageToDP(1)
     },
     filterButtonText: {
         fontSize: 14,
         color: '#333',
+        textAlign: 'center',
+        fontFamily:'Medium'
     },
     selectedFilterButtonText: {
-        color: '#FF4F12', // Цвет текста для выбранного фильтра
-        fontWeight: 'bold',
+        color: '#FF4F12',
     },
     userListContainer: {
-        backgroundColor: '#f9f9f9', // Светлый фон для списка пользователей
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
-        padding: 10,
+        backgroundColor: '#fff', // Светлый фон для списка пользователей
+        borderRadius:5,
+        width:widthPercentageToDP(93),
+        alignSelf:'center'
+    },
+    kvizListContent:{
+        marginLeft:15,
+        marginTop:3
     },
     userListTitle: {
         fontSize: 18,
@@ -311,8 +322,8 @@ const styles = StyleSheet.create({
     userContainer: {
         flexDirection: 'row', // Размещаем элементы в строку
         justifyContent: 'space-between', // Распределяем элементы по ширине
-        alignItems: 'center', // Выравниваем элементы по центру по вертикали
-        marginBottom: 10,
+        alignItems: 'center', // Выравниваем элементы по центру по вертикали,
+        padding:9
     },
     userInfoLeft: {
         flexDirection: 'row', // Размещаем элементы в строку
@@ -324,29 +335,32 @@ const styles = StyleSheet.create({
     },
     userRank: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily:'Bold',
         color: '#333',
         marginRight: 10, // Отступ между порядковым номером и именем
     },
     userName: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
+        color: '#000',
+        fontFamily:'Medium'
     },
     userPoints: {
-        fontSize: 14,
-        color: '#333',
-        marginRight: 5, // Отступ между очками и иконкой
+        fontSize: 16,
+        color: '#000',
+        marginRight: 1, // Отступ между очками и иконкой
+        fontFamily:'Medium'
     },
     orangeText: {
         color: '#FF4F12', // Оранжевый цвет текста
     },
-    fullOrangeText: {
-        color: '#FF4F12', // Полностью оранжевый текст
+    darkOrangeText: {
+        color: '#D33706', // Полностью оранжевый текст
+    },
+    violetText: {
+        color: '#7700FF', // Полностью оранжевый текст
     },
     kvizSection: {
-        marginTop: 20,
-        paddingHorizontal: 10,
+        marginTop:15
     },
     kvizTitle: {
         fontSize: 18,
@@ -354,7 +368,28 @@ const styles = StyleSheet.create({
         color: '#333',
         marginBottom: 10,
     },
-    kvizListContent: {
-        paddingVertical: 10,
+    topBorder:{
+        borderTopWidth:1,
+        borderTopColor:'#F3F3F4'
+    },
+    period:{
+        marginLeft:widthPercentageToDP(4),
+        fontFamily:'Regular',
+        fontSize:12,
+        color:'#90969F',
+        marginTop:heightPercentageToDP(-0.3)
+    },
+    learnContainer:{
+        width:'100%',
+        height:'100%',
+        backgroundColor:'#fff',
+        marginTop:heightPercentageToDP(1)
+    },
+    h2:{
+        width:widthPercentageToDP(90),
+        fontFamily:'Bold',
+        color: '#90969F', // Черный цвет текста,
+        fontSize: 12,
+        marginLeft:15
     },
 });
