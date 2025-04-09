@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/core';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Импортируем иконки
 import { ip_address } from "../../config";
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
 export default function Post({ postData }) {
     const [like, setLike] = useState(999);
@@ -92,10 +93,12 @@ export default function Post({ postData }) {
     return (
         <View style={styles.card}>
             {/* Отображение изображения */}
-            <Image
-                source={{ uri: `${ip_address}/images/${postData.image}` }} // Предполагается, что image — это путь
-                style={styles.image}
-            />
+            {postData.image && (
+                <Image
+                    source={{ uri: `${ip_address}/images/${postData.image}` }}
+                    style={styles.image}
+                />
+                )}
             {/* Описание поста */}
             <Text style={styles.description}>
                 {isExpanded ? fullText : truncatedText}
@@ -131,7 +134,7 @@ export default function Post({ postData }) {
 
                     {/* Рекомендовано вам */}
                     <View style={[styles.infoBadge, styles.recommendBadge]}>
-                        <Text style={styles.badgeText}>Рекомендовано</Text>
+                        <Text style={styles.badgeText}>рекомендовано</Text>
                     </View>
                 </View>
             </View>
@@ -142,35 +145,35 @@ export default function Post({ postData }) {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
-        borderRadius: 10,
+        borderRadius: 5,
         padding: 15,
-        marginVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
+        marginVertical: 5,
+        borderWidth: 1,
+        borderColor: '#F3F3F4',
+        width:widthPercentageToDP(100),
+        paddingBottom:7
     },
     image: {
         width: '100%',
         height: 200,
         borderRadius: 10,
         marginBottom: 10,
+        backgroundColor:'f3f3f3'
     },
     description: {
-        fontSize: 16,
+        fontSize: 15,
         color: '#333',
-        marginBottom: 10,
+        marginTop: 5,
+        fontFamily:'Regular'
     },
     showMoreButton: {
         color: '#007BFF',
-        fontWeight: 'bold',
         marginLeft: 5,
+        fontFamily:'Medium',
     },
     footer: {
         flexDirection: 'row', // Размещаем элементы в строку
         alignItems: 'center', // Выравниваем по центру по вертикали
-        justifyContent: 'space-between', // Лайки слева, остальное справа
         marginTop: 10,
     },
     likesContainer: {
@@ -181,17 +184,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#555',
         marginLeft: 5, // Добавляем отступ между иконкой и числом лайков
+        marginEnd:10
     },
     infoContainer: {
         flexDirection: 'row', // Размещаем топик и рекомендацию в строку
         alignItems: 'center', // Выравниваем по центру по вертикали
     },
     infoBadge: {
-        paddingVertical: 5,
+        paddingVertical: 4,
         paddingHorizontal: 10,
         borderRadius: 5,
-        borderWidth: 1,
-        marginLeft: 10, // Добавляем отступ между топиком и рекомендацией
+        marginLeft: 5, // Добавляем отступ между топиком и рекомендацией
     },
     topicBadge: {
         borderColor: '#FF4F12',
@@ -203,7 +206,7 @@ const styles = StyleSheet.create({
     },
     badgeText: {
         fontSize: 12,
-        fontWeight: 'bold',
+        fontFamily:'Medium',
         color: '#FFF',
     },
 });

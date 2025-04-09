@@ -5,6 +5,7 @@ import { TouchableOpacity, View, Text, Image, StyleSheet, FlatList } from 'react
 import { SafeAreaView } from "react-native-safe-area-context";
 import Curs from "../components/curs"; // Импортируем компонент Curs
 import Kviz from "../components/kviz"; // Импортируем компонент Kviz
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function LearnScreen() {
     // Навигация
@@ -168,6 +169,7 @@ export default function LearnScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView>
             {/* Верхняя панель (логотипы и фильтры) */}
             <View style={styles.topContainer}>
                 {/* Заголовок */}
@@ -228,7 +230,7 @@ export default function LearnScreen() {
                 showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
             />           
             </View>
-           
+            </ScrollView>
         </SafeAreaView>
     );
 }

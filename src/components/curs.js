@@ -1,8 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, Image, StyleSheet, Modal } from 'react-native';
+import { useNavigation } from "@react-navigation/core"; // Импортируем хук для навигации
+import { ip_address } from "../../config";
 
 export default function Curs({ postData }) {
+    const navigation = useNavigation(); // Инициализация навигации
     const [isModalVisible, setIsModalVisible] = useState(false); // Состояние для модального окна
+    const [course, setCourse] = useState([]);
+
+    const getCurrentCourse = async (id) => {
+        try {
+            const response = await fetch(ip_address + '/api/getCourse', {
+                method: 'POST', // Используем метод POST
+                headers: {
+                    'Content-Type': 'application/json', // Указываем, что данные отправляются в формате JSON
+                },
+                body: JSON.stringify({ id }), // Передаем id в теле запроса
+            });
+            const data = await response.json();
+            console.log(data);
+            setCourse(data); // Сохраняем полученные данные в состояние
+        } catch (error) {
+            console.error('Error fetching course:', error);
+        }
+    };
+
+    useEffect(() => {
+        getCurrentCourse(postData.course_id);
+    }, []);
 
     // Функция для открытия модального окна
     const openModal = () => {
@@ -67,15 +92,25 @@ export default function Curs({ postData }) {
 
                         {/* Количество разделов */}
                         <Text style={styles.modalSections}>
-                            Разделов: {postData.sections_count}{' '}
-                            {postData.sections_count % 2 === 0 ? '(четное)' : '(нечетное)'}
+                            {course.page_count}{' '}
+                            {course.page_count === 1
+                                ? 'страница'
+                                : course.page_count % 2 === 0
+                                    ? 'страницы'
+                                    : 'страниц'}
                         </Text>
 
                         {/* Описание курса */}
                         <Text style={styles.modalDescription}>{postData.description}</Text>
 
                         {/* Кнопка "Поехали!" */}
-                        <TouchableOpacity style={styles.goButton}>
+                        <TouchableOpacity
+                            style={styles.goButton}
+                            onPress={() => {
+                                closeModal(); // Скрываем модальное окно
+                                navigation.navigate('Курсы', { courseData: postData }); // Переходим на экран 'Курсы'
+                            }}
+                        >
                             <Text style={styles.goButtonText}>Поехали!</Text>
                         </TouchableOpacity>
                     </View>

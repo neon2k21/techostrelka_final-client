@@ -19,8 +19,17 @@ export default function SignupScreen() {
     const getAllFilters = async () => {
         try {
             const response = await fetch(ip_address + '/api/getAllTopic');
-            const data = await response.json();
-            setFilters(data);
+            const data = await response.json(); // Получаем данные из API
+
+            // Создаём новый массив с изменёнными объектами
+            const updatedArray = data.map(item => 
+            item.name === "научные изобретения"
+                ? { ...item, name: "изобретения" } // Обновляем только свойство name
+                : item // Оставляем объект без изменений
+            );
+
+            setFilters(updatedArray); // Обновляем состояние
+            setFilters(updatedArray);
         } catch (error) {
             console.error('Error fetching filters:', error);
             Alert.alert('Ошибка', 'Не удалось загрузить интересы');
@@ -59,18 +68,18 @@ export default function SignupScreen() {
         console.log("Данные для регистрации:", { name, login, password });
         console.log("selectedFilters = " + selectedFilters[0])
         try {
-            topic1id = 0;
-            topic2id = 0;
-            topic3id = 0;
-            topic4id = 0;
-            if(selectedFilters.includes("исскуство")){
-                topic1id = filters.find(filter => filter.name == "исскуство").id;
+            topic1id = null;
+            topic2id = null;
+            topic3id = null;
+            topic4id = null;
+            if(selectedFilters.includes("исcкуcтво")){
+                topic1id = filters.find(filter => filter.name == "исcкуcтво").id;
             }
             if(selectedFilters.includes("история")){
                 topic2id = filters.find(filter => filter.name == "история").id;
             }
-            if(selectedFilters.includes("научные изобретения")){
-                topic3id = filters.find(filter => filter.name == "научные изобретения").id;
+            if(selectedFilters.includes("изобретения")){
+                topic3id = filters.find(filter => filter.name == "изобретения").id;
             }
             if(selectedFilters.includes("традиции")){
                 topic4id = filters.find(filter => filter.name == "традиции").id;
@@ -92,6 +101,12 @@ export default function SignupScreen() {
                 }
             );
             console.log(response);
+            global.name = name
+            global.topic1_id = topic1id;
+            global.topic2_id = topic2id;
+            global.topic3_id = topic3id;
+            global.topic4_id = topic4id;
+            global.points = 0;
             // Переход на главный экран после успешной регистрации
             navigation.navigate('Главный экран');
         } catch (error) {
@@ -120,40 +135,41 @@ export default function SignupScreen() {
                     {/* Надпись "Регистрация" по левому краю */}
                     <Text style={styles.title}>Регистрация</Text>
 
-                    {/* Поле для ввода имени */}
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={setName}
-                        value={name}
-                        placeholder="Введите имя"
-                    />
+                   
 
                     {/* Поле для ввода логина */}
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, styles.sep]}
                         onChangeText={setLogin}
                         value={login}
-                        placeholder="Введите логин"
+                        placeholder="Логин"
                     />
 
                     {/* Поле для ввода пароля */}
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, styles.sep]}
                         secureTextEntry={true}
                         onChangeText={setPassword}
                         value={password}
-                        placeholder="Введите пароль"
+                        placeholder="Пароль"
                     />
 
                     {/* Поле для подтверждения пароля */}
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, styles.sep]}
                         secureTextEntry={true}
                         onChangeText={setConfirmPassword}
                         value={confirmPassword}
                         placeholder="Подтвердите пароль"
                     />
-
+                     {/* Поле для ввода имени */}
+                     <TextInput
+                        style={[styles.input, styles.sep1]}
+                        onChangeText={setName}
+                        value={name}
+                        placeholder="Имя"
+                    />
+                    <Text style={styles.h2}>выберите интересующие разделы</Text>
                     {/* Кнопки фильтров */}
                     {loading ? (
                         <ActivityIndicator size="large" color="#FF4F12" style={styles.loader} />
@@ -165,7 +181,6 @@ export default function SignupScreen() {
                                     onPress={() => handleFilterPress(filter.name)} // Используем topic_name из данных
                                     style={[
                                         styles.filterButton,
-                                        selectedFilters.includes(filter.name) && styles.selectedFilterButton,
                                     ]}
                                 >
                                     <Text
@@ -186,14 +201,14 @@ export default function SignupScreen() {
                         style={styles.registerButton}
                         onPress={sendData}
                     >
-                        <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
+                        <Text style={styles.registerButtonText}>зарегистрироваться!</Text>
                     </TouchableOpacity>
 
                     {/* Ссылка "Есть аккаунт? Войти" */}
                     <View style={styles.loginLinkContainer}>
-                        <Text style={styles.loginLinkText}>Есть аккаунт? </Text>
+                        <Text style={styles.loginLinkText}>есть аккаунт? </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Авторизация')}>
-                            <Text style={styles.loginLink}>Войти</Text>
+                            <Text style={styles.loginLink}>войти</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -221,90 +236,101 @@ const styles = StyleSheet.create({
         width: widthPercentageToDP(70),
         height: widthPercentageToDP(70),
         alignSelf: 'center',
-        marginTop: heightPercentageToDP(5),
+        marginTop: heightPercentageToDP(2),
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: heightPercentageToDP(3),
+        color: '#000',
+        marginBottom: heightPercentageToDP(2),
         alignSelf: 'flex-start',
+        fontFamily:'Bold'
+    },
+    sep:{
+        marginTop:heightPercentageToDP(0.5)
+    },
+    sep1:{
+        marginTop:heightPercentageToDP(1)
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingVertical: heightPercentageToDP(0.5), // Уменьшен отступ по вертикали
-        paddingHorizontal: widthPercentageToDP(2), // Уменьшен отступ по горизонтали
-        fontSize: 12, // Уменьшен размер текста
-        backgroundColor: '#fff',
-        marginBottom: heightPercentageToDP(1.5), // Уменьшен отступ между полями
-        height: heightPercentageToDP(4), // Уменьшена фиксированная высота
+        padding: heightPercentageToDP(1),
+        fontSize: 16,
+        backgroundColor: '#f8f8f8',
+        fontFamily:'Medium',
+        borderRadius:5,
+        color:'#90969F',
         width: widthPercentageToDP(90), // Фиксированная ширина для всех полей
     },
     filtersContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
         width: widthPercentageToDP(90), // Ширина контейнера фильтров
-        marginBottom: heightPercentageToDP(-2.5),
+        marginBottom: heightPercentageToDP(-1.5),
+        marginTop:heightPercentageToDP(0.5)
     },
     filterButton: {
-        paddingVertical: heightPercentageToDP(1),
-        paddingHorizontal: widthPercentageToDP(3),
-        borderRadius: 8,
+        paddingVertical: heightPercentageToDP(0.5),
+        paddingHorizontal: widthPercentageToDP(1.5),
+        borderRadius: 5,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#F3F3F4',
         marginBottom: heightPercentageToDP(2),
-    },
-    selectedFilterButton: {
-        borderColor: '#FF4F12',
-        backgroundColor: '#FFECE3',
+        marginRight:widthPercentageToDP(1)
     },
     filterButtonText: {
-        fontSize: 12,
+        fontSize: 13,
         color: '#333',
         textAlign: 'center',
+        fontFamily:'Medium'
     },
     selectedFilterButtonText: {
         color: '#FF4F12',
-        fontWeight: 'bold',
     },
     registerButton: {
         backgroundColor: '#FF4F12', // Оранжевый цвет
-        padding: heightPercentageToDP(2),
+        padding: heightPercentageToDP(1.7),
         borderRadius: 8,
-        marginTop: heightPercentageToDP(3),
+        marginTop: heightPercentageToDP(2),
+        fontFamily:'Bold',
         width: widthPercentageToDP(90), // Фиксированная ширина кнопки
     },
     registerButtonText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         textAlign: 'center',
-        fontWeight: 'bold',
+        fontFamily:'Bold'
     },
     loginLinkContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        marginTop: heightPercentageToDP(2),
+        justifyContent: 'center',
+        marginTop: heightPercentageToDP(0.7),
     },
     loginLinkText: {
-        fontSize: 14,
-        color: '#000',
+        fontSize: 13,
+        color: '#90969F', // Черный цвет текста,
+        fontFamily:'Medium'
     },
     loginLink: {
-        fontSize: 14,
+        fontSize: 13,
+        marginLeft: widthPercentageToDP(1),
+        fontFamily:'Bold',
         color: '#7700FF', // Синий цвет для ссылки
     },
     mascot: {
-        width: widthPercentageToDP(20), // Фиксированная ширина
-        height: widthPercentageToDP(20), // Фиксированная высота
+        width: widthPercentageToDP(30), // Фиксированная ширина
+        height: widthPercentageToDP(30), // Фиксированная высота
         alignSelf: 'center',
-        marginTop: heightPercentageToDP(3), // Отступ сверху
+        marginTop: heightPercentageToDP(12), // Отступ сверху
         marginBottom: heightPercentageToDP(5), // Отступ снизу
     },
     loader: {
         marginTop: heightPercentageToDP(5),
+    },
+    h2:{
+        width:widthPercentageToDP(90),
+        fontFamily:'Bold',
+        color: '#90969F', // Черный цвет текста,
+        fontSize: 12,
+        marginTop:heightPercentageToDP(1)
     },
 });

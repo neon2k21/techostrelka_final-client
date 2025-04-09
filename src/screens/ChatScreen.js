@@ -3,6 +3,8 @@ import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, Scro
 import axios from 'axios';
 import { Octicons } from '@expo/vector-icons'; // Импортируем иконки
 import { ip_address} from "../../config";
+import { ollama2_adress} from "../../config";
+
 
 export default function ChatScreen({ navigation }) {
   const [inputText, setInputText] = useState('');
@@ -59,13 +61,13 @@ export default function ChatScreen({ navigation }) {
     const percentagesBackend = { "исскуство": 0, "научные изобретения": 0, "традиции": 0, "история": 0 };
 
     // Формируем URL с параметром id
-    const url = `http://172.20.10.5:8080/api/getPercent`;
+    const url = `${ip_address}/api/getPercent`;
     
     var requestOptions = {
         method: 'GET',
         body: {id:global.id}
     };
-    const response = axios.post(`http://172.20.10.5:8080/api/getPercent`, {
+    const response = axios.post(`${ip_address}/api/getPercent`, {
       id: global.id, // Передаем ID квиза
     }).then(response => {
       if (!response.ok) {
@@ -138,7 +140,7 @@ export default function ChatScreen({ navigation }) {
 
 Ответ:`;
 
-      const response = await axios.post('http://192.168.99.74:3000/api/generate', {
+      const response = await axios.post(`${ollama2_adress}/api/generate`, {
         model: 'llama2',
         prompt: prompt,
         max_tokens: 50, // Ограничение длины ответа

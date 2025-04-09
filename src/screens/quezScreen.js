@@ -80,12 +80,12 @@ export default function QuezScreen({ route, navigation }) {
   const saveScoreToDatabase = async () => {
     try {
       const response = await axios.post(`${ip_address}/api/completekviz`, {
-        user_id: 2, // ID пользователя (замените на реальный ID)
+        user_id: global.id, // ID 
         kviz_id: kvizData.id,
       });
       console.log(response.data);
     } catch (error) {
-      console.error("Error saving score:", error);
+      Alert.alert('Произошла ошибка', 'Вы уже прошли этот квиз!');
       setIsSaveScoreErrorModalVisible(true); // Показываем модальное окно
     }
   };

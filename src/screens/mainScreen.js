@@ -3,6 +3,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/core';
 import { ip_address } from "../../config";
 import { TouchableOpacity, View, Text, Image, StyleSheet, FlatList, ScrollView } from 'react-native';
 import Post from "../components/post";
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MainScreen() {
@@ -94,7 +95,7 @@ export default function MainScreen() {
     );
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginTop:heightPercentageToDP(5) }}>
             {/* Верхняя панель (логотипы и фильтры) */}
             <View style={styles.topContainer}>
                 {/* Логотипы */}
@@ -129,24 +130,17 @@ export default function MainScreen() {
                 renderItem={renderPost}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
-                    paddingHorizontal: 10,
-                    paddingTop: 10,
-                    paddingBottom: 60, // Отступ снизу для нижней панели
+                   
                 }}
-                style={{ flex: 1 }} // FlatList занимает оставшееся пространство
+                style={{ flex: 1, backgroundColor:'#fff', width:widthPercentageToDP(100) }} // FlatList занимает оставшееся пространство
             />
-        </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     topContainer: {
         backgroundColor: '#fff', // Фон верхней панели
-        elevation: 3, // Тень для Android
-        shadowColor: '#000', // Тень для iOS
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
         padding: 10,
     },
     header: {
@@ -160,23 +154,27 @@ const styles = StyleSheet.create({
         resizeMode: 'contain', // Сохраняем пропорции изображения
     },
     filtersContainer: {
-        paddingVertical: 10,
-        paddingHorizontal: 5,
+        flexDirection: 'row',
+        width: widthPercentageToDP(90), // Ширина контейнера фильтров
+        marginBottom: heightPercentageToDP(-2),
+        marginTop:heightPercentageToDP(0.5)
     },
     filterButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
+        paddingVertical: heightPercentageToDP(0.5),
+        paddingHorizontal: widthPercentageToDP(1.5),
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: '#ccc', // Рамка не меняет цвет
-        marginRight: 10, // Отступ между кнопками
+        borderColor: '#F3F3F4',
+        marginBottom: heightPercentageToDP(2),
+        marginRight:widthPercentageToDP(1)
     },
     filterButtonText: {
         fontSize: 14,
         color: '#333',
+        textAlign: 'center',
+        fontFamily:'Medium'
     },
     selectedFilterButtonText: {
-        color: '#FF4F12', // Цвет текста для выбранного фильтра
-        fontWeight: 'bold',
+        color: '#FF4F12',
     },
 });

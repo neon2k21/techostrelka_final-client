@@ -71,7 +71,7 @@ export default function LoginScreen() {
                         style={styles.input}
                         onChangeText={setLogin}
                         value={login}
-                        placeholder="Введите логин"
+                        placeholder="Логин"
                     />
 
                     {/* Расстояние между полями ввода */}
@@ -96,11 +96,11 @@ export default function LoginScreen() {
 
                     {/* Надпись "Нет аккаунта? Зарегистрироваться" */}
                     <View style={styles.registerContainer}>
-                        <Text style={styles.noAccountText}>Нет аккаунта?</Text>
+                        <Text style={styles.noAccountText}>нет аккаунта?</Text>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Регистрация')}
                         >
-                            <Text style={styles.registerLinkText}>Зарегистрироваться</Text>
+                            <Text style={styles.registerLinkText}>зарегистрироваться</Text>
                         </TouchableOpacity>
                     </View>
                 <Image
@@ -129,54 +129,61 @@ const styles = StyleSheet.create({
         marginBottom: heightPercentageToDP(5),
     },
     mascot: {
-        width: widthPercentageToDP(35), // Увеличил ширину для лучшего отображения
-        height: widthPercentageToDP(35), // Высота равна ширине для сохранения пропорций
+        width: widthPercentageToDP(32), // Увеличил ширину для лучшего отображения
+        height: widthPercentageToDP(32), // Высота равна ширине для сохранения пропорций
         alignSelf: 'center',
         position: 'absolute',
-        top: heightPercentageToDP(92),
-        left: heightPercentageToDP(35),
+        top: heightPercentageToDP(88),
+        left: widthPercentageToDP(80),
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: heightPercentageToDP(2),
+        color: '#000',
+        marginBottom: heightPercentageToDP(2.7),
         alignSelf: 'flex-start', // Выравнивание по левому краю
+        fontFamily:'Bold'
     },
     input: {
         padding: heightPercentageToDP(1),
         fontSize: 16,
         backgroundColor: '#f8f8f8',
+        fontFamily:'Medium',
+        borderRadius:5,
+        color:'#90969F'
     },
     inputSpacing: {
-        height: heightPercentageToDP(1), // Расстояние между полями ввода
+        height: heightPercentageToDP(0.5), // Расстояние между полями ввода
     },
     loginButton: {
-        backgroundColor: '#6A0DAD', // Фиолетовый цвет
-        padding: heightPercentageToDP(2),
+        backgroundColor: '#7700FF', // Фиолетовый цвет
+        padding: heightPercentageToDP(1.7),
         borderRadius: 8,
         marginTop: heightPercentageToDP(2),
+        fontFamily:'Bold'
     },
     loginButtonText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         textAlign: 'center',
-        fontWeight: 'bold',
+        fontFamily:'Bold'
     },
     registerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: heightPercentageToDP(1),
+        marginTop: heightPercentageToDP(0.7),
     },
     noAccountText: {
-        fontSize: 14,
-        color: '#90969F', // Черный цвет текста
+        fontSize: 13,
+        color: '#90969F', // Черный цвет текста,
+        fontFamily:'Medium'
 
     },
     registerLinkText: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#EC4E58', // Оранжевый цвет текста
-        marginLeft: widthPercentageToDP(2),
+        marginLeft: widthPercentageToDP(1),
+        fontFamily:'Bold'
     },
 });
