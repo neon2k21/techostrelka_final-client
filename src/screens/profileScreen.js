@@ -1,14 +1,66 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome"; // Импортируем FontAwesomeimport { SafeAreaView } from "react-native-safe-area-context";
 import { ip_address } from "../../config";
+import Curs from "../components/cursComplete"; // Импортируем компонент Curs
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute, useNavigation } from '@react-navigation/core';
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 
 
 export default function ProfileScreen() {
-  const [filters, setFilters] = useState([]); // Массив фильтров (интересов)
+  const navigation = useNavigation();
 
+  const [filters, setFilters] = useState([]); // Массив фильтров (интересов)
+  const [actualPosts, setActualPosts] = useState([]);
+  const [recommend, setRecommend] = useState([]);
+
+
+  
+
+
+const renderPost = ({ item }) => (
+        <Curs postData={item} />
+    );
+    const processcourses = async () => {
+      try {
+          const response = await fetch(`${ip_address}/api/processcourses`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  user_id: global.id
+              })
+          });
+
+          if (!response.ok) throw new Error('Network response was not ok');
+
+          const data = await response.json();
+          console.log('Результат:', data.courses);
+          setActualPosts(data.courses)
+      } catch (error) {
+          console.error('Ошибка:', error);
+      }
+  };
+  const getCoursesByUserTopics = async () => {
+    try {
+        const response = await fetch(`${ip_address}/api/getCoursesByUserTopics`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: global.id
+            })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        console.log('Результат:', data.courses);
+        setRecommend(data.courses)
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+};
   // Функция для получения фильтров из API
   const getAllFilters = async () => {
     try {
@@ -31,6 +83,8 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     getAllFilters(); // Загружаем фильтры при монтировании компонента
+    processcourses()
+    getCoursesByUserTopics()
   }, []);
 
   // Функция для получения массива интересов из глобальных переменных
@@ -74,7 +128,7 @@ export default function ProfileScreen() {
   const interests = getInterests();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Заголовок */}
       <View style={styles.header}>
         <View style={styles.userInfo}>
@@ -94,7 +148,7 @@ export default function ProfileScreen() {
 
       {/* Выбранные интересы */}
       <View style={styles.interestsContainer}>
-        <Text style={styles.sectionTitle}>выбранные интересы:</Text>
+        <Text style={styles.h3}>выбранные интересы:</Text>
         <View style={styles.tagsContainer}>
           {interests.map((interest, index) => (
             <Text key={index} style={styles.tag}>
@@ -104,38 +158,42 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <View style={{ backgroundColor: "#fff", flex: 1 }}>
-        {/* Просмотренные курсы */}
-        <View style={styles.section}>
+      <View style={{ backgroundColor: "#fff", width:'100%', height:'100%'}}>
+        {/* Просмотренные ресурсы */}
           <View style={styles.card}>
-            <View style={styles.sectionHeader}>
+            <TouchableOpacity onPress={()=>{navigation.navigate("Просмотренные курсы")}}style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Просмотренные курсы</Text>
               <Icon name="arrow-forward" size={20} color="#FF4F12" /> {/* Стрелка вправо */}
-            </View>
-          </View>
-        </View>
-
-        {/* Пройденные квизы */}
-        <View style={styles.section}>
-          <View style={styles.card}>
-            <View style={styles.sectionHeader}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{navigation.navigate("Пройденные квизы")}}style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Пройденные квизы</Text>
               <Icon name="arrow-forward" size={20} color="#FF4F12" /> {/* Стрелка вправо */}
-            </View>
+            </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Вам может понравиться */}
-        <View style={styles.section}>
-          <View style={styles.card}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>вам может понравится</Text>
-              <Icon name="arrow-forward" size={20} color="#FF4F12" /> {/* Стрелка вправо */}
-            </View>
-          </View>
-        </View>
+          <Text style={styles.h3}>я прохожу</Text>
+
+
+        
+         <FlatList
+                        data={actualPosts}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={renderPost}
+                        
+                        horizontal
+                        showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
+                    />     
+          <FlatList
+                        data={recommend}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={renderPost}
+                        
+                        horizontal
+                        showsHorizontalScrollIndicator={false} // Скрываем индикатор прокрутки
+                    />   
+        
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -143,7 +201,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
-    padding: 20,
+    padding: 0,
+    width:'100%'
   },
 
   // Заголовок
@@ -151,15 +210,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
+    paddingHorizontal: 20,
+    marginTop:heightPercentageToDP(7.5)
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   name: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontFamily:'Bold'
   },
   editButton: {
     marginLeft: 10,
@@ -179,13 +240,14 @@ const styles = StyleSheet.create({
     resizeMode: "contain", // Сохраняем пропорции изображения
   },
   interestsContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 16,
     marginBottom: 5,
-    color: "#90969F",
+    color: "#000",
+    fontFamily:'Medium'
   },
   tagsContainer: {
     flexDirection: "row",
@@ -198,8 +260,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 5,
     marginBottom: 5,
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontFamily:'Medium'
   },
   section: {
     marginBottom: 20,
@@ -210,12 +272,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    padding: 7,
   },
   card: {
     backgroundColor: "#FFFFFF",
-    padding: 15,
     borderRadius: 5,
+    width:widthPercentageToDP(93),
+    alignSelf:'center',
+    borderWidth:1,
+    borderColor:'#F3F3F4',
+    marginTop:heightPercentageToDP(1.6)
   },
   courseTitle: {
     fontSize: 16,
@@ -238,4 +304,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14,
   },
+  h3:{
+    width:widthPercentageToDP(90),
+    fontFamily:'Regular',
+    color: '#90969F', // Черный цвет текста,
+    fontSize: 14,
+    marginBottom:5
+},
 });

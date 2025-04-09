@@ -83,6 +83,7 @@ export default function QuezScreen({ route, navigation }) {
         user_id: global.id, // ID 
         kviz_id: kvizData.id,
       });
+      global.points=global.points+kvizData.reward
       console.log(response.data);
     } catch (error) {
       Alert.alert('Произошла ошибка', 'Вы уже прошли этот квиз!');

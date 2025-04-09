@@ -4,12 +4,21 @@ import axios from 'axios';
 import { Octicons } from '@expo/vector-icons'; // Импортируем иконки
 import { ip_address} from "../../config";
 import { ollama2_adress} from "../../config";
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 
 
 export default function ChatScreen({ navigation }) {
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState([
-    { sender: 'ai', text: 'Привет! Хочешь разобраться, что тебе больше всего интересно? Помогу!' }
+    { sender: 'ai', text: 'Привет! Я здесь, чтобы помочь тебе найти фильмы, которые тебе понравятся. Расскажи, какие жанры тебя интересуют?' },
+    { sender: 'user', text: 'Привет! Мне нравятся фантастика и приключения.' },
+    { sender: 'ai', text: 'Отлично! А есть ли конкретные актёры или режиссёры, которых ты особенно любишь?' },
+    { sender: 'user', text: 'Да, мне нравятся фильмы с Леонардо Ди Каприо.' },
+    { sender: 'ai', text: 'Понял! А как насчёт продолжительности фильма? Тебе больше нравятся короткие фильмы (меньше 2 часов) или длинные эпические истории?' },
+    { sender: 'user', text: 'Думаю, длинные фильмы — это здорово!' },
+    { sender: 'ai', text: 'Замечательно! Ещё один вопрос: ты предпочитаешь старые классические фильмы или современные новинки?' },
+    { sender: 'user', text: 'Скорее современные новинки.' },
+    { sender: 'ai', text: 'Спасибо за ответы! Теперь я знаю, что тебе нравятся современные фильмы в жанре фантастики и приключений с Леонардо Ди Каприо, а также длинные эпические истории. Сейчас подберу подходящие рекомендации!' },
   ]);
   const [context, setContext] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -192,25 +201,28 @@ export default function ChatScreen({ navigation }) {
   console.log("История - "+percentages.history+"%, Наука - "+percentages.science+"%, Культура - "+percentages.culture+"%, Традиции - "+percentages.traditions+"%.")
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Заголовок */}
+      <View style={styles.headerContainer}>
       <View style={styles.header}>
         <View style={styles.profileContainer}>
           {/* Аватар */}
           <Image
-            source={require('../../assets/mascot.png')} // Убедитесь, что у вас есть изображение в assets
+            source={require('../../assets/avaKult.png')} // Убедитесь, что у вас есть изображение в assets
             style={styles.avatar}
           />
           {/* Имя и подпись */}
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>KULTKOD</Text>
-            <Text style={styles.profileSubtitle}>чат с ИИ</Text>
+            <Text style={styles.profileSubtitle}>чат с ии</Text>
           </View>
         </View>
         {/* Кнопка очистки контекста */}
         <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-          <Text style={styles.clearButtonText}>Очистить контекст</Text>
+          <Text style={styles.clearButtonText}>очистить</Text>
+          <Text style={[styles.clearButtonText, {marginTop:-5}]}>контекст</Text>
         </TouchableOpacity>
+      </View>
       </View>
 
       {/* Лента чата */}
@@ -257,7 +269,7 @@ export default function ChatScreen({ navigation }) {
       {isLoading && (
         <Text style={styles.loadingText}>Загрузка...</Text>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -272,17 +284,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#7700FF', // Фиолетовый цвет фона заголовка
+    backgroundColor: '#7700FF', // Фиолетовый цвет фона заголовка,
+    marginTop:heightPercentageToDP(5.5)
+
+  },
+  headerContainer:{
+    height:heightPercentageToDP(12),
+    backgroundColor: '#7700FF', // Фиолетовый цвет фона заголовка,\
+    borderBottomEndRadius:5,
+    borderBottomStartRadius:5,
+
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25, // Круглая форма аватара
   },
   profileInfo: {
@@ -290,19 +309,22 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#fff',
+    fontFamily:'Bold'
   },
   profileSubtitle: {
-    fontSize: 14,
-    color: '#f0f0f0',
+    fontSize: 12,
+    color: '#fff',
+    fontFamily:'Regular',
+    marginTop:-5
   },
   clearButton: {
     padding: 5,
   },
   clearButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily:'Bold'
   },
   chatContainer: {
     flex: 1,
@@ -336,7 +358,7 @@ const styles = StyleSheet.create({
   },
   userMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#dcf8c6',
+    backgroundColor: '#FFCAB7',
   },
   aiMessage: {
     alignSelf: 'flex-start',

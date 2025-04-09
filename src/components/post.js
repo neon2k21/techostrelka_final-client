@@ -55,7 +55,7 @@ export default function Post({ postData }) {
             if (!response.ok) throw new Error('Network response was not ok');
 
             const data = await response.json();
-            console.log('Проверка лайка:', data);
+            setIsLiked(data.isLiked)
 
         } catch (error) {
             console.error('Ошибка:', error);
@@ -72,7 +72,6 @@ export default function Post({ postData }) {
             });
 
             const result = await response.json();
-            console.log(result)
             setLike(result.length);
         } catch (error) {
             console.error('getLikes error', error);
@@ -82,7 +81,7 @@ export default function Post({ postData }) {
     // Получение лайков при фокусе на экране
     useFocusEffect(useCallback(() => {
         getPostLikes();
-        // checkLike();
+        checkLike();
     }, []));
 
     // Ограничение длины текста

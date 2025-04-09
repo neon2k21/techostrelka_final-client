@@ -13,6 +13,10 @@ import ChatScreen from './screens/ChatScreen';
 import SignupScreen from './screens/singupScreen';
 import QuezScreen from './screens/quezScreen';
 import CourseScreen from './screens/courseScreen';
+import CompletedCoursesScreen from './screens/completedCourses';
+import CompletedQuezesScreen from './screens/completedQuezes';
+import KinoScreen from './screens/kinoScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,10 +41,13 @@ function LearnScreen_StackNavigator() {
     );
 }
 
+
 function ProfileScreen_StackNavigator() {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Личка" options={{ headerShown: false }} component={ProfileScreen} />
+            <Stack.Screen name="Просмотренные курсы" options={{ headerShown: false }} component={CompletedCoursesScreen} />
+            <Stack.Screen name="Пройденные квизы" options={{ headerShown: false }} component={CompletedQuezesScreen} />
         </Stack.Navigator>
     );
 }
@@ -60,6 +67,13 @@ function MainScreen_StackNavigator() {
         </Stack.Navigator>
     );
 }
+function KinoScreen_StackNavigator() {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Кино" options={{ headerShown: false }} component={KinoScreen} />
+        </Stack.Navigator>
+    );
+}
 
 function Bottom_stacknavigator() {
     return (
@@ -76,6 +90,8 @@ function Bottom_stacknavigator() {
                         iconName = 'chat-outline'; // Контурная иконка "Чат"
                     } else if (route.name === 'Профиль') {
                         iconName = 'account-outline'; // Контурная иконка "Профиль"
+                    }else if (route.name === 'Киноархив') {
+                        iconName = 'camera-burst'; // Контурная иконка "Профиль"
                     }
 
                     // Возвращаем иконку с текущим цветом и размером
@@ -98,9 +114,10 @@ function Bottom_stacknavigator() {
                 },
             })}
         >
-            <Tab.Screen name="Главная" options={{ headerShown: false }} component={MainScreen_StackNavigator} />
+           <Tab.Screen name="Главная" options={{ headerShown: false }} component={MainScreen_StackNavigator} />
             <Tab.Screen name="Обучение" options={{ headerShown: false }} component={LearnScreen_StackNavigator} />
             <Tab.Screen name="Чат" options={{ headerShown: false }} component={ChatScreen_StackNavigator} />
+            <Tab.Screen name="Киноархив" options={{ headerShown: false }} component={KinoScreen_StackNavigator} />
             <Tab.Screen name="Профиль" options={{ headerShown: false }} component={ProfileScreen_StackNavigator} />
         </Tab.Navigator>
     );

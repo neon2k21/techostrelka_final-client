@@ -1,28 +1,39 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/core';
 import { ip_address } from '../../config';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+import { WebView } from 'react-native-webview';
 
 export default function CourseScreen() {
     const route = useRoute();
-    const navigation = useNavigation(); // Инициализация навигации
-    const { courseData } = route.params; // Данные о курсе из предыдущего экрана
+    const navigation = useNavigation();
+    const { courseData } = route.params;
     const [pages, setPages] = useState([]);
     const [loading, setLoading] = useState(true);
-    const pageRefs = useRef([]); // Референсы для каждой страницы
+    const [currentPageIndex, setCurrentPageIndex] = useState(0); // Текущая страница
 
     // Функция для получения данных страниц курса
     const fetchCoursePages = async (id) => {
         try {
+            const response = await fetch(ip_address + '/api/addCourseToProcess', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id:global.id, course_id:courseData.course_id }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        }catch(error){
+            console.log(`Ошибка завершения курса: `+error)
+        }
+    
+        try {
             const response = await fetch(ip_address + '/api/getPage', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    course_id: id,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ course_id: id }),
             });
 
             if (!response.ok) {
@@ -30,43 +41,55 @@ export default function CourseScreen() {
             }
 
             const data = await response.json();
-            console.log('Server response:', data); // Логируем данные для отладки
+            console.log('Server response:', data);
 
-            // Проверяем, есть ли данные в ответе
             if (data.error) {
                 console.error('Server error:', data.error);
-                setLoading(false); // Завершаем загрузку, даже если есть ошибка
+                setLoading(false);
                 return;
             }
 
-            // Преобразуем строку blocks в массив
             const parsedPages = data.map(page => ({
                 ...page,
-                blocks: JSON.parse(page.blocks), // Парсим строку JSON в массив
+                blocks: JSON.parse(page.blocks),
             }));
 
-            // Обновляем состояние страниц
-            setPages(parsedPages || []); // Предполагается, что данные страниц находятся в поле `pages`
-            setLoading(false); // Завершаем загрузку
+            // Добавляем дополнительную страницу с текстом и кнопкой
+            const completionPage = {
+                name: 'Завершение курса',
+                blocks: [
+                    {
+                        type: 'text',
+                        content: `\nСпасибо за прохождение курса "${courseData.course_name}"!\nЧтобы завершить курс, нажмите кнопку ниже.\n`,
+                    },
+                ],
+            };
+
+            setPages([...parsedPages, completionPage]); // Добавляем страницу завершения
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching course pages:', error);
-            setLoading(false); // Завершаем загрузку в случае ошибки
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchCoursePages(courseData.course_id);
+    }, []);
 
-        // Инициализация референсов для каждой страницы
-        pageRefs.current = pages.map(() => React.createRef());
-    }, [pages]);
+    // // Прокрутка к следующей странице
+    // const scrollToNextPage = () => {
+    //     if (currentPageIndex < pages.length - 1) {
+    //         setCurrentPageIndex(currentPageIndex + 1);
+    //     }
+    // };
 
-    // Прокрутка к определенной странице
-    const scrollToPage = (index) => {
-        if (pageRefs.current[index]?.current) {
-            pageRefs.current[index].current.scrollTo({ y: 0, animated: true });
-        }
-    };
+    // // Прокрутка к предыдущей странице
+    // const scrollToPreviousPage = () => {
+    //     if (currentPageIndex > 0) {
+    //         setCurrentPageIndex(currentPageIndex - 1);
+    //     }
+    // };
 
     if (loading) {
         return (
@@ -84,48 +107,69 @@ export default function CourseScreen() {
         );
     }
 
+    const completeCourse = async () => {
+        try {
+            const response = await fetch(ip_address + '/api/completecourse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id:global.id, course_id:courseData.course_id }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        }catch(error){
+            console.log(`Ошибка завершения курса: `+error)
+        }
+        alert('Курс успешно завершен!');
+        navigation.goBack(); // Возвращаемся на предыдущий экран
+    };
+
     return (
         <View style={styles.container}>
             {/* Верхний блок с названием курса и кнопкой "Выйти" */}
             <View style={styles.headerContainer}>
-                {/* Название курса */}
                 <Text style={styles.courseTitleHeader}>{courseData.course_name}</Text>
-
-                {/* Кнопка "Выйти" */}
                 <TouchableOpacity
                     style={styles.exitButton}
-                    onPress={() => navigation.goBack()} // Возвращаемся на предыдущий экран
+                    onPress={() => navigation.goBack()}
                 >
                     <Text style={styles.exitButtonText}>Выйти</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Кнопки навигации */}
-            <FlatList
-                horizontal
-                data={pages} // Передаем массив страниц
-                keyExtractor={(item, index) => index.toString()} // Уникальный ключ для каждого элемента
-                renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                        style={styles.navButton}
-                        onPress={() => scrollToPage(index)}
-                    >
-                        <Text style={styles.navButtonText}>{index + 1}</Text>
-                    </TouchableOpacity>
-                )}
-                contentContainerStyle={styles.navigationContainer}
-                style={styles.scrollViewStyle} // Устанавливаем фиксированную высоту
-            />
+            {/* Индикатор страниц */}
+            <View style={styles.pageIndicatorContainer}>
+                {pages.map((_, index) => (
+                    <View
+                        key={index}
+                        style={[
+                            styles.pageIndicatorDot,
+                            currentPageIndex === index && styles.activePageIndicatorDot,
+                        ]}
+                    />
+                ))}
+            </View>
 
             {/* Основной контент */}
-            <ScrollView contentContainerStyle={styles.contentContainer}>
-                {/* Отображение страниц курса */}
+            <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={(event) => {
+                    const newIndex = Math.round(
+                        event.nativeEvent.contentOffset.x / widthPercentageToDP(100)
+                    );
+                    setCurrentPageIndex(newIndex);
+                }}
+            >
                 {pages.map((page, pageIndex) => (
-                    <View key={pageIndex} ref={pageRefs.current[pageIndex]} style={styles.pageContainer}>
-                        {/* Название страницы */}
+                    <ScrollView
+                        key={pageIndex}
+                        style={styles.pageContainer}
+                        contentContainerStyle={styles.pageContentContainer}
+                    >
                         <Text style={styles.pageTitle}>{page.name}</Text>
-
-                        {/* Отображение блоков контента */}
                         {page.blocks.map((block, index) => {
                             switch (block.type) {
                                 case 'text':
@@ -138,24 +182,83 @@ export default function CourseScreen() {
                                     return (
                                         <Image
                                             key={index}
-                                            source={{ uri: block.content }}
+                                            source={{ uri: ip_address +`/`+ block.content }}
                                             style={styles.imageBlock}
                                             resizeMode="contain"
                                         />
                                     );
                                 case 'video':
+                                    const videoUrl = ip_address +`/`+ block.content;
+
+                                    if (!videoUrl || !videoUrl.startsWith('http') || !block.content) {
+                                        return (
+                                            <View key={index} style={styles.videoBlock}>
+                                                <Text style={styles.errorText}>
+                                                    Недействительная ссылка на видео
+                                                </Text>
+                                            </View>
+                                        );
+                                    }
+
+                                    const htmlContent = `
+                                        <!DOCTYPE html>
+                                        <html>
+                                        <head>
+                                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                            <style>
+                                                body, html {
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    overflow: hidden;
+                                                }
+                                                video {
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    object-fit: contain;
+                                                }
+                                            </style>
+                                        </head>
+                                        <body>
+                                            <video controls autoplay>
+                                                <source src="${videoUrl}" type="video/mp4">
+                                                Ваш браузер не поддерживает видео.
+                                            </video>
+                                        </body>
+                                        </html>
+                                    `;
+
                                     return (
                                         <View key={index} style={styles.videoBlock}>
                                             <Text style={styles.videoText}>Видео:</Text>
-                                            <Text style={styles.videoLink}>{block.content}</Text>
+                                            <WebView
+                                                style={styles.webView}
+                                                originWhitelist={['*']}
+                                                source={{ html: htmlContent }}
+                                                allowsFullscreenVideo={true}
+                                                javaScriptEnabled={true}
+                                                scalesPageToFit={true}
+                                            />
                                         </View>
                                     );
                                 default:
                                     return null;
                             }
                         })}
-                    </View>
+                        {/* Кнопка завершения курса на последней странице */}
+                        {pageIndex === pages.length - 1 && (
+                            <TouchableOpacity
+                                style={styles.completeButton}
+                                onPress={completeCourse}
+                            >
+                                <Text style={styles.completeButtonText}>Завершить курс</Text>
+                            </TouchableOpacity>
+                        )}
+                    </ScrollView>
+                    
                 ))}
+                
             </ScrollView>
         </View>
     );
@@ -177,14 +280,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
     },
     courseTitleHeader: {
-        fontSize: 20,
+        fontSize: heightPercentageToDP(2.3),
+        paddingRight: 5,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#555',
     },
     exitButton: {
         paddingVertical: 5,
         paddingHorizontal: 10,
-        backgroundColor: '#FF4F12', // Оранжевый цвет
+        backgroundColor: '#FF4F12',
         borderRadius: 5,
     },
     exitButtonText: {
@@ -192,47 +296,48 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
     },
-    scrollViewStyle: {
-        height:0, // Высота FlatList равна высоте кнопок
-    },
-    navigationContainer: {
-        paddingHorizontal: 5,
-        backgroundColor: '#f5f5f5',
-    },
-    navButton: {
-        width: 40,
-        height: 40,
-        backgroundColor: '#7700FF', // Фиолетовый цвет
+    pageIndicatorContainer: {
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 8,
+        marginVertical: 10,
+    },
+    pageIndicatorDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#ccc',
         marginHorizontal: 5,
+    },
+    activePageIndicatorDot: {
+        backgroundColor: '#FF4F12',
+    },
+    navigationButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        marginBottom: 10,
+    },
+    navButton: {
+        padding: 10,
+        backgroundColor: '#7700FF',
+        borderRadius: 5,
+    },
+    disabledNavButton: {
+        backgroundColor: '#ccc',
     },
     navButtonText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#fff', // Белый текст
-    },
-    contentContainer: {
-        flexGrow: 1,
-        paddingTop: 0, // Убираем верхний отступ
-        paddingBottom: 20, // Оставляем нижний отступ
-        paddingHorizontal: 20, // Горизонтальные отступы остаются
-        backgroundColor: '#fff',
-    },
-    loaderContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-    errorText: {
-        fontSize: 16,
-        color: '#FF4F12',
-        textAlign: 'center',
+        color: '#fff',
     },
     pageContainer: {
-        marginBottom: 350,
+        width: widthPercentageToDP(100),
+        padding: 20,
+        backgroundColor: '#f5f5f5',
+    },
+    pageContentContainer: {
+        paddingBottom: 20, // Добавляем отступ внизу для удобства прокрутки
     },
     pageTitle: {
         fontSize: 20,
@@ -258,9 +363,21 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FF4F12',
     },
-    videoLink: {
-        fontSize: 14,
-        color: '#007AFF',
-        textDecorationLine: 'underline',
+    webView: {
+        flex: 1,
+        width: '100%',
+        height: 200,
+        marginTop: 10,
+    },
+    loaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#FF4F12',
+        textAlign: 'center',
     },
 });
