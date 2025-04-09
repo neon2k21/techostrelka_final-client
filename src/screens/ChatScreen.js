@@ -59,45 +59,38 @@ export default function ChatScreen({ navigation }) {
     const percentagesBackend = { "исскуство": 0, "научные изобретения": 0, "традиции": 0, "история": 0 };
 
     // Формируем URL с параметром id
-    const id = 2; // Предполагается, что ID равен 2
-    const url = `${ip_address}/api/getPercent`;
+    const url = `http://172.20.10.5:8080/api/getPercent`;
     
     var requestOptions = {
         method: 'GET',
         body: {id:global.id}
     };
-    
-    fetch(url, requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(result => {
-            // Проверяем, что результат — массив и содержит хотя бы один элемент
-            if (Array.isArray(result) && result.length > 0) {
-                // Извлекаем строку JSON из поля percent_by_topic
-                const percentString = result[0].percent_by_topic;
-    
-                // Преобразуем строку JSON в объект JavaScript
-                const parsedPercentages = JSON.parse(percentString);
-    
-                // Обновляем значения в percentagesBackend
-                percentagesBackend.исскуство = parsedPercentages.исскуство;
-                percentagesBackend['научные изобретения'] = parsedPercentages['научные изобретения'];
-                percentagesBackend.традиции = parsedPercentages.традиции;
-                percentagesBackend.история = parsedPercentages.история;
-    
-                // Логируем обновленные значения
-                console.log(
-                    `"${percentagesBackend.исскуство},${percentagesBackend['научные изобретения']},${percentagesBackend.традиции},${percentagesBackend.история}"`
-                );
-            } else {
-                console.error("Invalid server response:", result);
-            }
-        })
-        .catch(error => console.log('Backend to chatbot error', error));
+    const response = axios.post(`http://172.20.10.5:8080/api/getPercent`, {
+      id: global.id, // Передаем ID квиза
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      console.log("back response - "+response.json())
+      return response.json();
+    }).then(result => {
+        // Проверяем, что результат — массив и содержит хотя бы один элемент
+        const percentString = result.percent_by_topic;
+
+        // Преобразуем строку JSON в объект JavaScript
+        const parsedPercentages = JSON.parse(percentString);
+
+        // Обновляем значения в percentagesBackend
+        percentagesBackend.исскуство = parsedPercentages.исскуство;
+        percentagesBackend['научные изобретения'] = parsedPercentages['научные изобретения'];
+        percentagesBackend.традиции = parsedPercentages.традиции;
+        percentagesBackend.история = parsedPercentages.история;
+
+        // Логируем обновленные значения
+        console.log(
+            `"${percentagesBackend.исскуство},${percentagesBackend['научные изобретения']},${percentagesBackend.традиции},${percentagesBackend.история}"`
+        );
+    }).catch(error => console.log('Backend to chatbot error', error));
 
 
     return {
