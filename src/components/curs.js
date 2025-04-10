@@ -79,7 +79,7 @@ export default function Curs({ postData }) {
 
                         {/* Изображение курса */}
                         <Image
-                            source={{ uri: `${postData.course_preview}` }}
+                            source={{ uri: `${ip_address}/${postData.course_preview}` }} // Предполагается, что course_preview — это путь к изображению
                             style={styles.modalImage}
                         />
 

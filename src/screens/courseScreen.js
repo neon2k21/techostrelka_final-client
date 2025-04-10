@@ -134,7 +134,7 @@ export default function CourseScreen() {
                     style={styles.exitButton}
                     onPress={() => navigation.goBack()}
                 >
-                    <Text style={styles.exitButtonText}>Выйти</Text>
+                    <Text style={styles.exitButtonText}>выйти</Text>
                 </TouchableOpacity>
             </View>
 
@@ -270,31 +270,30 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     headerContainer: {
-        marginTop: heightPercentageToDP(4),
+        marginTop: heightPercentageToDP(5),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#fff',
+        marginBottom:-10
     },
     courseTitleHeader: {
-        fontSize: heightPercentageToDP(2.3),
+        fontSize: 20,
         paddingRight: 5,
-        fontWeight: 'bold',
-        color: '#555',
+        color: '#000',
+        fontFamily:'Bold'
     },
     exitButton: {
         paddingVertical: 5,
-        paddingHorizontal: 10,
-        backgroundColor: '#FF4F12',
+        paddingHorizontal: 0,
+        backgroundColor: '#fff',
         borderRadius: 5,
     },
     exitButtonText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#fff',
+        fontSize: 15,
+        color: '#7700FF',
+        fontFamily:'Bold'
     },
     pageIndicatorContainer: {
         flexDirection: 'row',
@@ -334,26 +333,29 @@ const styles = StyleSheet.create({
     pageContainer: {
         width: widthPercentageToDP(100),
         padding: 20,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff',
+        paddingTop:0
     },
     pageContentContainer: {
         paddingBottom: 20, // Добавляем отступ внизу для удобства прокрутки
     },
     pageTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#7700FF',
+        fontSize: 16,
+        color: '#000',
         marginBottom: 10,
+        fontFamily:'Bold'
     },
     textBlock: {
-        fontSize: 16,
-        color: '#555',
+        fontSize: 13,
+        color: '#000',
         marginBottom: 10,
+        fontFamily:'Regular'
     },
     imageBlock: {
-        width: '100%',
-        height: 200,
+        width: widthPercentageToDP(90),
+        height: heightPercentageToDP(28),
         marginBottom: 10,
+        borderRadius:5
     },
     videoBlock: {
         marginBottom: 10,

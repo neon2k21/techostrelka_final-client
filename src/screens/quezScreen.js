@@ -79,7 +79,7 @@ export default function QuezScreen({ route, navigation }) {
   // Функция для записи очков в базу данных
   const saveScoreToDatabase = async () => {
     try {
-      const response = await axios.post(`${ip_address}/api/completekviz`, {
+      const response = await axios.post(`${ip_address}/api/insertCompletedKviz`, {
         user_id: global.id, // ID 
         kviz_id: kvizData.id,
       });
